@@ -1,4 +1,3 @@
-import os
 import random
 
 from telebot import StateMemoryStorage, TeleBot, types
@@ -53,9 +52,8 @@ def get_random_russian_word(user):
 
 def set_start():
     buttons.clear()
-    learning = types.KeyboardButton(Command.LEARNING)
-    buttons.extend([learning])
-    return buttons
+    learning_btn = types.KeyboardButton(Command.LEARNING)
+    return learning_btn
 
 def set_buttons(target_word, other_words):
     buttons.clear()
@@ -80,8 +78,10 @@ def set_command_buttons():
 
 @bot.message_handler(commands=['cards', 'start'])
 def start_bot(message):
+    markup = types.ReplyKeyboardMarkup(row_width=2)
     if not check_user(message.from_user.id):
         set_new_user(message.from_user.id)
+    markup.add(set_start())
     bot.send_message(message.chat.id, 'Привет, здесь ты можешь попрактиковаться в английском языке) \n'
                                       'Тренировки можешь проходить в удобном для себя темпе. \n'
                                       'Можешь использовать меня как конструктор, добавляй слова, которые хочешь запомнить.\n'
@@ -89,8 +89,7 @@ def start_bot(message):
                                       '- добавить слово ➕,\n'
                                       '- удалить слово 🔙.\n'
                                       'Тебе будут попадаться как твои слова, так и слова из общей базы.\n'
-                                      'Ну что, начнём ⬇️')
-    start_learning(message)
+                                      'Ну что, начнём ⬇️', reply_markup=markup)
 
 @bot.message_handler(func=lambda message: message.text == Command.LEARNING)
 def start_learning(message):

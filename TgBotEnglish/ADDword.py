@@ -1,5 +1,4 @@
 from DBCreator import session
-from def_words import default_words
 from model import  User, WordsPair, UsersWordsPair
 
 def get_user_pair_id(user_id, rus, eng):
