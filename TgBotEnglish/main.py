@@ -3,12 +3,12 @@ import random
 from telebot import StateMemoryStorage, TeleBot, types
 from telebot.states import StatesGroup, State
 
-from ADDword import set_default_words, set_new_pair_words
-from DBCreator import session
-from DeleteWords import delete_user_word
-from GETwords import get_all_general_words, get_all_rus_from_user, get_translate_to_english, \
+from add_word import set_default_words, set_new_pair_words, check_words
+from db_creator import create_table
+from delete_words import delete_user_word
+from get_words import get_all_general_words, get_all_rus_from_user, get_translate_to_english, \
     get_all_eng_words_for_other, get_users_words
-from SETuser import check_user, set_new_user
+from set_user import check_user, set_new_user
 from def_words import default_words
 
 print('Start telegram bot...')
@@ -35,8 +35,8 @@ def show_hint(*lines):
     return '\n'.join(lines)
 
 buttons = []
-rusword = []
-engword = []
+rusword = {}
+engword = {}
 
 def get_random_russian_word(user):
     def_words = get_all_general_words()
@@ -144,14 +144,14 @@ def add_my_word(message):
 
 def add_rus_word(message):
     rusword.clear()
-    rusword.append(message.text)
+    rusword[message.chat.id] = message.text
     eng = bot.send_message(message.chat.id, 'Введи слово на английском')
     bot.register_next_step_handler(eng, add_eng_word)
 
 def add_eng_word(message):
     engword.clear()
-    engword.append(message.text)
-    result = set_new_pair_words(message.from_user.id, rusword[0].lower(), engword[0].lower())
+    engword[message.chat.id] = message.text
+    result = set_new_pair_words(message.from_user.id, rusword[message.chat.id].lower(), engword[message.chat.id].lower())
     if result:
         bot.send_message(message.chat.id, result)
     else:
@@ -182,9 +182,10 @@ def message_reply(message):
 
 
 if __name__ == '__main__':
-    set_default_words(default_words)
+    if not check_words():
+        create_table()
+        set_default_words(default_words)
     bot.polling()
-    session.close()
 
 
 

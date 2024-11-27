@@ -1,4 +1,4 @@
-from DBCreator import session
+from db_creator import session
 from model import  User, WordsPair, UsersWordsPair
 
 def get_user_pair_id(user_id, rus, eng):
@@ -35,8 +35,18 @@ def set_new_pair_words(user_id, rus, eng):
         session.commit()
         return ''
 
+def check_words():
+    words = session.query(WordsPair.id).select_from(WordsPair).all()
+    if words:
+        return True
+
 def set_default_words(words):
     for eng, rus in words.items():
-        new_pair = WordsPair(russian_word = rus, english_word = eng, default_word = True)
-        session.add(new_pair)
-        session.commit()
+        word = (session.query(WordsPair.id).select_from(WordsPair)
+                .filter(WordsPair.russian_word == rus)
+                .filter(WordsPair.english_word == eng)
+                .filter(WordsPair.default_word == True)).all()
+        if not word:
+            new_pair = WordsPair(russian_word = rus, english_word = eng, default_word = True)
+            session.add(new_pair)
+            session.commit()

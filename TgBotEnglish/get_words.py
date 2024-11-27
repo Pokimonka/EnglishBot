@@ -1,6 +1,6 @@
 import random
 
-from DBCreator import session
+from db_creator import session
 from model import WordsPair, UsersWordsPair, User
 
 

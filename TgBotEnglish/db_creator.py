@@ -1,12 +1,7 @@
 import os
-from distutils.command.check import check
-
 import sqlalchemy
-from sqlalchemy import delete, exists
 from sqlalchemy.orm import sessionmaker
-from sqlalchemy.testing.suite.test_reflection import users
-
-from model import create_tables, User, WordsPair, UsersWordsPair
+from model import create_tables
 
 os.environ["DB_USER_NAME"] = "postgres"
 os.environ["PASSWORD"] = "Alenka33"
@@ -19,11 +14,11 @@ DB_NAME = os.getenv("DB_NAME")
 DSN = f'postgresql://{DB_USER_NAME}:{PASSWORD}@localhost:5432/{DB_NAME}'
 engine = sqlalchemy.create_engine(DSN)
 
-create_tables(engine)
-
 Session = sessionmaker(bind=engine)
 session = Session()
 
+def create_table():
+    create_tables(engine)
 
 
 
